@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Traveloop is a calm, reliable travel planning workspace for multi-city trips, budgets, itineraries, packing, and notes."
+    />
+    <meta name="theme-color" content="#0F766E" />
+    <title>Traveloop - Confident Multi-City Travel Planning</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F766E'/%3E%3Cpath fill='white' d='M15 34 49 16 37 50l-7-15-15-1Z'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=20260510p" />
+  </head>
+  <body class="auth-screen">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand" href="#dashboard" data-route="dashboard" aria-label="Traveloop dashboard">
+          <span class="brand-mark">T</span>
+          <span>
+            <strong>Traveloop</strong>
+            <small>Plan with confidence</small>
+          </span>
+        </a>
+
+        <nav class="nav-list">
+          <a href="#dashboard" data-route="dashboard">Home</a>
+          <a href="#create" data-route="create">Create trip</a>
+          <a href="#trips" data-route="trips">My trips</a>
+          <a href="#itinerary" data-route="itinerary">Itinerary</a>
+          <a href="#search" data-route="search">Explore</a>
+          <a href="#map" data-route="map">Map</a>
+          <a href="#gallery" data-route="gallery">Gallery</a>
+          <a href="#budget" data-route="budget">Budget</a>
+          <a href="#packing" data-route="packing">Packing</a>
+          <a href="#journal" data-route="journal">Notes</a>
+          <a href="#profile" data-route="profile">Profile</a>
+          <a href="#admin" data-route="admin">Admin</a>
+        </nav>
+
+        <div class="profile-card">
+          <span class="avatar">MR</span>
+          <div>
+            <strong>Mohd</strong>
+            <small>3 active loops</small>
+          </div>
+          <a class="sidebar-logout" href="/logout" data-logout>Logout</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="menu-button" id="menuButton" aria-label="Toggle navigation">Menu</button>
+          <label class="global-search">
+            <span>Search trips and activities</span>
+            <input type="search" placeholder="Search cities, activities, notes" />
+          </label>
+          <div class="topbar-actions">
+            <div class="theme-switcher" aria-label="Theme">
+              <button data-theme-choice="ocean">Ocean</button>
+              <button data-theme-choice="sunset">Sunset</button>
+              <button data-theme-choice="midnight">Night</button>
+            </div>
+            <button class="icon-button" aria-label="Notifications" data-show-notifications>!</button>
+            <button class="primary-button" data-route="create">New trip</button>
+            <a class="secondary-button" href="/logout" data-logout>Logout</a>
+          </div>
+        </header>
+
+        <section class="view" id="login" data-view="login">
+          <div class="login-layout">
+            <div class="login-visual" aria-hidden="true">
+              <div class="route-map">
+                <span class="pin paris">Paris</span>
+                <span class="pin rome">Rome</span>
+                <span class="pin santorini">Santorini</span>
+                <span class="pin istanbul">Istanbul</span>
+              </div>
+            </div>
+            <form class="auth-panel" id="authForm">
+              <p class="eyebrow">Trusted trip planning</p>
+              <h1>Bring every detail of a multi-city trip into one calm workspace.</h1>
+              <div class="field">
+                <label>Name</label>
+                <input id="authName" value="Mohd" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input id="authEmail" type="email" value="mohd@example.com" autocomplete="email" />
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input id="authPassword" type="password" value="traveloop" autocomplete="current-password" />
+              </div>
+              <button class="primary-button wide" type="submit" data-auth-action="login">Sign in</button>
+              <button class="secondary-button wide" type="button" data-auth-action="signup">Create account</button>
+              <button class="text-button wide" type="button" data-forgot-password>Forgot password?</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="view" id="dashboard" data-view="dashboard">
+          <div class="welcome-banner">
+            <div>
+              <p class="eyebrow">Good morning</p>
+              <h1 id="welcomeTitle">Ready to plan your next loop?</h1>
+              <p>Quick tip: keep a 10-15% buffer for taxis, weather changes, and last-minute food finds.</p>
+            </div>
+            <div class="button-row">
+              <button class="primary-button" data-route="create">Create a trip</button>
+              <a class="secondary-button" href="/logout" data-logout>Sign out</a>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel featured-trip" id="featuredTrip"></article>
+            <article class="panel recent-panel">
+              <div class="panel-heading">
+                <h2>Recent activity</h2>
+                <button class="text-button" data-route="itinerary">Open plan</button>
+              </div>
+              <div id="recentActivities"></div>
+            </article>
+          </div>
+
+          <div class="metrics-grid" id="dashboardMetrics"></div>
+
+          <section class="insight-grid">
+            <article class="panel" id="weatherPanel"></article>
+            <article class="panel" id="pollPanel"></article>
+            <article class="panel trip-assistant" id="assistantPanel"></article>
+          </section>
+
+          <section class="section-block">
+            <div class="panel-heading">
+              <h2>Popular cities</h2>
+              <button class="text-button" data-route="search">Explore all</button>
+            </div>
+            <div class="city-grid" id="popularCities"></div>
+          </section>
+
+          <section class="section-block">
+            <div class="panel-heading">
+              <h2>Current trips</h2>
+              <button class="text-button" data-route="trips">View all</button>
+            </div>
+            <div class="cards-grid trip-card-row"></div>
+          </section>
+        </section>
+
+        <section class="view" id="create" data-view="create">
+          <div class="page-heading">
+            <p class="eyebrow">Create trip</p>
+            <h1>Build a trip that feels clear before anyone books.</h1>
+          </div>
+          <div class="builder-layout">
+            <form class="panel form-grid" id="createTripForm">
+              <div class="field">
+                <label>Trip name</label>
+                <input data-trip-field="name" value="Japan Autumn Loop" />
+                <small class="helper-text">Use a name your group will recognize.</small>
+              </div>
+              <div class="field">
+                <label>Destination</label>
+                <input data-trip-field="destination" value="Tokyo, Kyoto, Osaka" />
+                <small class="helper-text">Add one or more cities.</small>
+              </div>
+              <div class="field">
+                <label>Dates</label>
+                <input data-trip-field="dates" value="Oct 12 - Oct 21" />
+                <small class="helper-text">Example: Oct 12 - Oct 21</small>
+              </div>
+              <div class="field">
+                <label>Travelers</label>
+                <input data-trip-field="travelers" value="4 friends" />
+                <small class="helper-text">People, family, team, or solo.</small>
+              </div>
+              <div class="field">
+                <label>Budget</label>
+                <input data-trip-field="budget" value="5600" inputmode="numeric" />
+                <small class="helper-text">Optional estimate in USD.</small>
+              </div>
+              <div class="field">
+                <label>Start date</label>
+                <input data-trip-field="startDate" value="2026-10-12" />
+                <small class="helper-text">Used for countdowns.</small>
+              </div>
+              <div class="field full">
+                <label>Travel style</label>
+                <div class="chip-group" data-chip-group>
+                  <button type="button" class="selected" data-chip>Food</button>
+                  <button type="button" data-chip>Culture</button>
+                  <button type="button" data-chip>Nature</button>
+                  <button type="button" data-chip>Nightlife</button>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Trip description</label>
+                <input data-trip-field="description" placeholder="A relaxed food, culture, and train-focused trip." />
+                <small class="helper-text">This appears in shared trip summaries.</small>
+              </div>
+              <div class="field full">
+                <label>Cover photo upload</label>
+                <input id="coverPhotoInput" type="file" accept="image/*" />
+                <small class="helper-text">Optional image for the trip card.</small>
+              </div>
+              <button class="primary-button full" type="button" data-create-trip>Generate itinerary</button>
+            </form>
+            <aside class="panel preview-panel">
+              <span class="status-pill">Smart preview</span>
+              <h2>What Traveloop will organize</h2>
+              <div class="timeline compact">
+                <div><b>Day 1</b><span>Arrival plan, hotel buffer, first meal.</span></div>
+                <div><b>Budget</b><span>Estimated cost ranges by category.</span></div>
+                <div><b>Packing</b><span>Weather-aware checklist by category.</span></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="trips" data-view="trips">
+          <div class="page-heading">
+            <p class="eyebrow">My trips</p>
+            <h1>Every loop, sorted and ready.</h1>
+          </div>
+          <div class="cards-grid trip-list"></div>
+        </section>
+
+        <section class="view" id="itinerary" data-view="itinerary">
+          <nav class="breadcrumbs" aria-label="Breadcrumbs">
+            <button data-route="dashboard">Dashboard</button>
+            <span>/</span>
+            <button data-route="trips">My trips</button>
+            <span>/</span>
+            <strong>Mediterranean Sprint</strong>
+          </nav>
+          <div class="page-heading split">
+            <div>
+              <p class="eyebrow">Itinerary builder</p>
+              <h1>Mediterranean Sprint</h1>
+            </div>
+            <div class="button-row">
+              <div class="segmented-control" aria-label="Itinerary view">
+                <button class="active" data-itinerary-view="list">List</button>
+                <button data-itinerary-view="calendar">Calendar</button>
+              </div>
+              <button class="secondary-button" data-print-page>Print / Download PDF</button>
+              <button class="primary-button" data-route="share">Public view</button>
+            </div>
+          </div>
+          <div class="itinerary-layout">
+            <article class="panel">
+              <form class="inline-form" id="itineraryForm">
+                <label class="field">
+                  <span>Day</span>
+                  <input id="itineraryDay" value="1" inputmode="numeric" />
+                </label>
+                <label class="field">
+                  <span>Time</span>
+                  <input id="itineraryTime" value="14:00" />
+                </label>
+                <label class="field">
+                  <span>Date</span>
+                  <input id="itineraryDate" placeholder="Jun 16" />
+                </label>
+                <label class="field">
+                  <span>City</span>
+                  <input id="itineraryCity" placeholder="Barcelona" />
+                </label>
+                <label class="field">
+                  <span>Cost</span>
+                  <input id="itineraryCost" value="0" inputmode="numeric" />
+                </label>
+                <label class="field grow">
+                  <span>Plan item</span>
+                  <input id="itineraryItem" placeholder="Add museum visit, dinner, train..." />
+                </label>
+                <button class="primary-button" type="submit">Add stop</button>
+              </form>
+              <div class="day-tabs" id="dayTabs"></div>
+              <div class="timeline" id="itineraryItems"></div>
+            </article>
+            <aside class="panel recommendation-panel">
+              <h2>Suggested adds</h2>
+              <div class="suggestion">
+                <strong>Gothic Quarter photo walk</strong>
+                <span>1.5 hr - low cost - near hotel</span>
+                <button class="secondary-button" data-add-itinerary="Gothic Quarter photo walk">Add</button>
+              </div>
+              <div class="suggestion">
+                <strong>Sunset ferry</strong>
+                <span>2 hr - scenic - group friendly</span>
+                <button class="secondary-button" data-add-itinerary="Sunset ferry">Add</button>
+              </div>
+              <button class="secondary-button wide" data-route="budget">Review cost</button>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="search" data-view="search">
+          <div class="page-heading">
+            <p class="eyebrow">Explore</p>
+            <h1>Find places that fit your route, budget, and pace.</h1>
+          </div>
+          <div class="explore-photo-strip" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" />
+            <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy" />
+          </div>
+          <div class="search-board">
+            <aside class="panel filter-panel">
+              <h2>Activity filters</h2>
+              <label><input type="checkbox" data-activity-filter="family" checked /> Family friendly</label>
+              <label><input type="checkbox" data-activity-filter="under50" checked /> Under $50</label>
+              <label><input type="checkbox" data-activity-filter="rain" /> Rain safe</label>
+              <label><input type="checkbox" data-activity-filter="transit" checked /> Near transit</label>
+            </aside>
+            <div class="explore-results">
+              <article class="panel city-search-panel">
+                <div class="panel-heading">
+                  <h2>City search</h2>
+                  <select id="regionFilter" aria-label="Filter cities by region">
+                    <option value="all">All regions</option>
+                    <option value="Europe">Europe</option>
+                    <option value="Asia">Asia</option>
+                    <option value="Inspiration">Inspiration</option>
+                  </select>
+                </div>
+                <input id="citySearchInput" type="search" placeholder="Search city or country" />
+                <div class="city-result-grid" id="cityResults"></div>
+              </article>
+              <div class="cards-grid" id="activityCards"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="map" data-view="map">
+          <div class="page-heading split">
+            <div>
+              <p class="eyebrow">Map</p>
+              <h1>Route pins from the trip API.</h1>
+            </div>
+            <button class="secondary-button" data-route="itinerary">Open itinerary</button>
+          </div>
+          <div class="map-layout">
+            <article class="panel map-panel">
+              <div class="map-canvas" id="mapCanvas" aria-label="Trip map"></div>
+              <div class="map-provider">OpenStreetMap route layer via Leaflet</div>
+            </article>
+            <aside class="map-side">
+              <div class="panel map-details" id="mapDetails"></div>
+              <form class="panel map-add-form" id="mapPinForm">
+                <h2>Add map place</h2>
+                <label class="field"><span>City</span><input id="pinCity" placeholder="Florence" /></label>
+                <label class="field"><span>Country</span><input id="pinCountry" placeholder="Italy" /></label>
+                <label class="field"><span>Day</span><input id="pinDay" value="4" inputmode="numeric" /></label>
+                <label class="field"><span>Summary</span><input id="pinSummary" placeholder="Train stop, lunch, viewpoint..." /></label>
+                <button class="primary-button" type="submit">Add to map</button>
+              </form>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="gallery" data-view="gallery">
+          <div class="page-heading split">
+            <div>
+              <p class="eyebrow">Tour gallery</p>
+              <h1>Store the photos that make each trip feel alive.</h1>
+            </div>
+            <button class="secondary-button" data-route="trips">Choose trip</button>
+          </div>
+          <div class="gallery-layout">
+            <aside class="panel gallery-uploader">
+              <h2>Add tour photo</h2>
+              <form id="galleryForm" class="gallery-form">
+                <label class="field">
+                  <span>Tour</span>
+                  <select id="galleryTripSelect"></select>
+                </label>
+                <label class="field">
+                  <span>Photo</span>
+                  <input id="galleryImageInput" type="file" accept="image/*" />
+                </label>
+                <label class="field">
+                  <span>Caption</span>
+                  <input id="galleryCaption" placeholder="Sunset at the old town lookout" />
+                </label>
+                <label class="field">
+                  <span>Location</span>
+                  <input id="galleryLocation" placeholder="Barcelona, Spain" />
+                </label>
+                <label class="field">
+                  <span>Date</span>
+                  <input id="galleryDate" type="date" />
+                </label>
+                <button class="primary-button wide" type="submit">Save photo</button>
+              </form>
+            </aside>
+            <div class="gallery-main">
+              <article class="panel gallery-summary" id="galleryStats"></article>
+              <div class="gallery-grid" id="galleryGrid"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="budget" data-view="budget">
+          <div class="page-heading split">
+            <div>
+              <p class="eyebrow">Budget</p>
+              <h1>Readable estimates your group can trust.</h1>
+            </div>
+            <div class="tooltip-wrap">
+              <button class="secondary-button">What's included?</button>
+              <span role="tooltip">Based on average costs from other travelers and your planned activities.</span>
+            </div>
+          </div>
+          <div class="budget-layout">
+            <article class="panel budget-overview" id="budgetOverview"></article>
+            <article class="panel" id="budgetCategories"></article>
+          </div>
+          <section class="budget-editor-grid">
+            <form class="panel budget-edit-form" id="budgetLimitForm">
+              <h2>Edit trip budget</h2>
+              <label class="field">
+                <span>Total trip limit</span>
+                <input id="budgetLimitInput" inputmode="numeric" placeholder="4200" />
+              </label>
+              <button class="primary-button" type="submit">Save budget</button>
+            </form>
+            <form class="panel budget-edit-form" id="budgetExpenseForm">
+              <h2>Add accountable expense</h2>
+              <label class="field">
+                <span>Expense</span>
+                <input id="expenseTitle" placeholder="Train tickets, hotel deposit..." />
+              </label>
+              <label class="field">
+                <span>Category</span>
+                <select id="expenseCategory">
+                  <option>Transport</option>
+                  <option>Hotels</option>
+                  <option>Food</option>
+                  <option>Activities</option>
+                  <option>Flights</option>
+                  <option>Shopping</option>
+                  <option>Emergency</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Amount</span>
+                <input id="expenseAmount" inputmode="numeric" placeholder="120" />
+              </label>
+              <label class="field">
+                <span>Paid by</span>
+                <input id="expensePayer" placeholder="Mohd" />
+              </label>
+              <label class="field">
+                <span>Day</span>
+                <input id="expenseDay" inputmode="numeric" value="1" />
+              </label>
+              <label class="field">
+                <span>Split between</span>
+                <input id="expenseSplit" inputmode="numeric" value="1" />
+              </label>
+              <button class="primary-button full" type="submit">Add expense</button>
+            </form>
+          </section>
+          <article class="panel budget-ledger">
+            <div class="panel-heading">
+              <h2>Accountability ledger</h2>
+              <span class="status-pill">Live totals</span>
+            </div>
+            <div id="budgetLedger"></div>
+          </article>
+          <article class="panel daily-budget">
+            <div class="panel-heading">
+              <h2>Daily spending</h2>
+              <span class="status-pill">Estimate</span>
+            </div>
+            <div class="daily-bars" id="dailyBars"></div>
+          </article>
+        </section>
+
+        <section class="view" id="packing" data-view="packing">
+          <div class="page-heading split">
+            <div>
+              <p class="eyebrow">Packing checklist</p>
+              <h1>Grouped by category, easy to finish together.</h1>
+            </div>
+            <div class="button-row">
+              <button class="secondary-button" data-reset-packing>Reset checklist</button>
+              <button class="secondary-button" data-save-template>Save template</button>
+            </div>
+          </div>
+          <article class="panel packing-summary" id="packingSummary"></article>
+          <form class="panel packing-form" id="packingForm">
+            <label class="field">
+              <span>Add item</span>
+              <input id="packingInput" placeholder="Sunscreen, camera, snacks" />
+            </label>
+            <label class="field">
+              <span>Category</span>
+              <select id="packingCategory">
+                <option>Clothing</option>
+                <option>Documents</option>
+                <option>Electronics</option>
+                <option>Health</option>
+                <option>Misc</option>
+              </select>
+            </label>
+            <button class="primary-button" type="submit">Add to packing</button>
+          </form>
+          <div class="packing-groups" id="packingList"></div>
+        </section>
+
+        <section class="view" id="share" data-view="share">
+          <div class="public-page">
+            <div class="public-hero">
+              <p class="eyebrow">Shared itinerary</p>
+              <h1>Mediterranean Sprint</h1>
+              <p>Barcelona, Nice, and Rome in seven carefully paced days.</p>
+              <div class="button-row">
+                <button class="primary-button" data-copy-trip>Copy Trip</button>
+                <button class="secondary-button" data-share-social>Share</button>
+              </div>
+            </div>
+            <div class="panel public-plan" id="publicPlan"></div>
+          </div>
+        </section>
+
+        <section class="view" id="journal" data-view="journal">
+          <div class="page-heading">
+            <p class="eyebrow">Trip notes</p>
+            <h1>Journal the decisions and the memories.</h1>
+          </div>
+          <form class="panel note-form" id="noteForm">
+            <input id="noteId" type="hidden" />
+            <label class="field">
+              <span>Day</span>
+              <input id="noteDay" value="1" inputmode="numeric" />
+            </label>
+            <label class="field">
+              <span>Title</span>
+              <input id="noteTitle" placeholder="Dinner idea, reminder, booking note" />
+            </label>
+            <label class="field grow">
+              <span>Note</span>
+              <input id="noteBody" placeholder="Write a useful note for the group..." />
+            </label>
+            <button class="primary-button" type="submit" id="noteSubmitButton">Add note</button>
+            <button class="secondary-button" type="button" data-cancel-note-edit>Cancel edit</button>
+          </form>
+          <div class="journal-grid"></div>
+        </section>
+
+        <section class="view" id="profile" data-view="profile">
+          <div class="page-heading">
+            <p class="eyebrow">Profile</p>
+            <h1>Traveler settings and account trust controls.</h1>
+          </div>
+          <div class="profile-layout">
+            <article class="panel profile-overview" id="profileOverview"></article>
+            <article class="panel profile-settings">
+              <h2>Editable profile</h2>
+              <form id="profileForm" class="profile-form">
+                <label class="field"><span>Name</span><input id="profileName" /></label>
+                <label class="field"><span>Email</span><input id="profileEmail" type="email" /></label>
+                <label class="field">
+                  <span>Language</span>
+                  <select id="profileLanguage">
+                    <option>English</option>
+                    <option>Hindi</option>
+                    <option>Arabic</option>
+                    <option>French</option>
+                    <option>Japanese</option>
+                  </select>
+                </label>
+                <label class="field"><span>Avatar upload</span><input id="avatarUpload" type="file" accept="image/*" /></label>
+                <button class="primary-button" type="submit">Save profile</button>
+              </form>
+            </article>
+            <article class="panel saved-destinations" id="savedDestinations"></article>
+            <article class="panel danger-zone">
+              <h2>Privacy and account</h2>
+              <label class="toggle-row">
+                <span>Make trips public by default</span>
+                <input type="checkbox" id="privacyToggle" />
+              </label>
+              <p class="muted-text">Deleting your account removes your saved trips, notes, packing items, and active session from this device.</p>
+              <div class="delete-confirm">
+                <label class="field">
+                  <span>Type DELETE to enable account removal</span>
+                  <input id="deleteConfirm" placeholder="DELETE" />
+                </label>
+                <button class="danger-button" id="deleteAccountButton" disabled>Delete account</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="admin" data-view="admin">
+          <div class="page-heading">
+            <p class="eyebrow">Admin analytics</p>
+            <h1>Platform health for the Traveloop demo.</h1>
+          </div>
+          <div class="admin-grid" id="adminAnalytics"></div>
+        </section>
+
+        <footer class="trust-footer">
+          <span>Secure planning</span>
+          <span>No hidden fees</span>
+          <span>Used by 1,000+ travelers</span>
+        </footer>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button data-route="dashboard">Home</button>
+      <button data-route="trips">Trips</button>
+      <button data-route="itinerary">Plan</button>
+      <button data-route="gallery">Gallery</button>
+      <button data-route="packing">Pack</button>
+      <button data-route="profile">Profile</button>
+    </nav>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js?v=20260510q"></script>
+  </body>
+</html>
